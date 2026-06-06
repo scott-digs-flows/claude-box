@@ -1,0 +1,6 @@
+.env
+.claude-config/
+workspace/
+shared/
+
+.claude-config/.credentials.json

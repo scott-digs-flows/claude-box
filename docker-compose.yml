@@ -1,0 +1,36 @@
+services:
+  claude-code:
+    build: .
+    # Run as a one-off interactive session: `docker compose run --rm claude-code`
+    stdin_open: true   # docker run -i
+    tty: true          # docker run -t
+    working_dir: /workspace
+    volumes:
+      # --- Primary workspace -------------------------------------------------
+      # The project you're actively working in. Read-write.
+      - ./workspace:/workspace
+      - .:/workspace/claude-box # this folder (Dockerfile etc.), editable
+      - ../tailwind:/workspace/tailwind  # sibling project, editable
+
+      # --- Additional scoped mounts -----------------------------------------
+      # Each line exposes ONE host folder to the container and nothing else.
+      # The container can only see paths you explicitly list here, so the
+      # rest of your machine stays inaccessible.
+      #
+      # Format:  <host path>:<path inside container>[:ro]
+      # Add `:ro` to make a mount read-only.
+      - ./shared/reference:/mnt/reference:ro   # read-only reference material
+      - ./shared/data:/mnt/data                # read-write data folder
+      # - /absolute/path/on/host:/mnt/other    # example: mount from elsewhere
+
+      # --- Persisted auth/config --------------------------------------------
+      # Keeps your login between runs so you don't re-authenticate each time.
+      - ./.claude-config:/root/.claude
+
+    environment:
+      # Option A: leave unset and log in interactively on first run.
+      # Option B: token-based auth — set CLAUDE_CODE_OAUTH_TOKEN in a .env file
+      #           (run `claude setup-token` on your host to generate one).
+      - CLAUDE_CODE_OAUTH_TOKEN=${CLAUDE_CODE_OAUTH_TOKEN:-}
+      # Option C: API-key billing instead — uncomment and set in .env:
+      # - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
