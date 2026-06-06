@@ -69,3 +69,5 @@ want Claude Code to read but never modify.
 - The `.claude-config/` folder stores your login so you only authenticate
   once. Add it (and `.env`) to `.gitignore` if this folder is a repo.
 - Edit the `Dockerfile` to add language runtimes or tools your projects need.
+
+# Misc
